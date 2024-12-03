@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    :root {
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #F5F5F5;
+      --text-primary: #333333;
+      --text-secondary: #999999;
+      --border-color: #E5E5E5;
+      --hover-bg: rgba(0, 0, 0, 0.03);
+      --button-primary: #18A0FB;
+      --button-hover: #0D8DE3;
+      --button-disabled: #CCCCCC;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #2C2C2C;
+      --bg-secondary: #383838;
+      --text-primary: #FFFFFF;
+      --text-secondary: #ABABAB;
+      --border-color: #444444;
+      --hover-bg: rgba(255, 255, 255, 0.06);
+      --button-primary: #0D99FF;
+      --button-hover: #0D8DE3;
+      --button-disabled: #444444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background-color: var(--bg-primary);
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      margin: 0;
+      padding: 16px;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 100%;
+      height: 100%;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    select, input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      height: 32px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    select:hover, input:hover {
+      border-color: var(--text-secondary);
+    }
+
+    select:focus, input:focus {
+      border-color: var(--button-primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(24, 160, 251, 0.1);
+    }
+
+    button {
+      background: var(--button-primary);
+      color: white;
+      border: none;
+      padding: 0 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      transition: background-color 0.2s ease;
+      height: 32px;
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+    }
+
+    button:disabled {
+      background: var(--button-disabled);
+      cursor: not-allowed;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .radio-option:hover {
+      background: var(--hover-bg);
+      border-radius: 4px;
+    }
+
+    .radio-option input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .radio-option label {
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .input-group {
+      display: none;
+    }
+
+    select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1.5L6 6.5L11 1.5" stroke="%23333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    [data-theme="dark"] select {
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1.5L6 6.5L11 1.5" stroke="%23FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    }
+
+    ::placeholder {
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <div class="section-title">Collection Selection</div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" id="newCollection" name="collectionChoice" value="new" checked>
+          <label for="newCollection">Create new collection</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="existingCollection" name="collectionChoice" value="existing">
+          <label for="existingCollection">Use existing collection</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="newCollectionInput" class="input-group">
+      <div class="section-title">New Collection Name</div>
+      <input type="text" id="newCollectionName" placeholder="e.g. Brand Colors">
+    </div>
+
+    <div id="existingCollectionInput" class="input-group">
+      <div class="section-title">Select Collection</div>
+      <select id="existingCollectionSelect">
+        <option value="">Please select a collection...</option>
+      </select>
+    </div>
+    
+    <button id="create">Create Variables</button>
+  </div>
+
+  <script>
+    // Check Figma theme and set the appropriate theme
+    function updateTheme() {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.setAttribute('data-theme', 'dark');
+      } else {
+        document.body.setAttribute('data-theme', 'light');
+      }
+    }
+
+    // Initial theme check
+    updateTheme();
+
+    // Listen for theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(updateTheme);
+
+    // Request existing collections from the plugin
+    parent.postMessage({ pluginMessage: { type: 'get-collections' } }, '*');
+
+    // Listen for messages from the plugin
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg.type === 'collections-list') {
+        const select = document.getElementById('existingCollectionSelect');
+        msg.collections.forEach(collection => {
+          const option = document.createElement('option');
+          option.value = collection.name;
+          option.textContent = collection.name;
+          select.appendChild(option);
+        });
+      }
+    };
+
+    // Handle radio button changes
+    document.querySelectorAll('input[name="collectionChoice"]').forEach((radio) => {
+      radio.addEventListener('change', (e) => {
+        const newCollectionInput = document.getElementById('newCollectionInput');
+        const existingCollectionInput = document.getElementById('existingCollectionInput');
+        
+        if (e.target.value === 'new') {
+          newCollectionInput.style.display = 'block';
+          existingCollectionInput.style.display = 'none';
+        } else {
+          newCollectionInput.style.display = 'none';
+          existingCollectionInput.style.display = 'block';
+        }
+      });
+    });
+
+    // Initial display state
+    document.getElementById('newCollectionInput').style.display = 'block';
+
+    // Handle create button click
+    document.getElementById('create').onclick = () => {
+      const useExisting = document.getElementById('existingCollection').checked;
+      let collectionName = '';
+
+      if (useExisting) {
+        collectionName = document.getElementById('existingCollectionSelect').value;
+        if (!collectionName) {
+          alert('Please select a collection');
+          return;
+        }
+      } else {
+        collectionName = document.getElementById('newCollectionName').value;
+        if (!collectionName) {
+          alert('Please enter a name for the new collection');
+          return;
+        }
+      }
+
+      parent.postMessage({
+        pluginMessage: {
+          type: 'create-variables',
+          useExistingCollection: useExisting,
+          collectionName: collectionName
+        }
+      }, '*');
+    };
+  </script>
+</body>
+</html>
