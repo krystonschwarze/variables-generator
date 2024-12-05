@@ -62,8 +62,19 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
                         const nameParts = node.name.split('/').map(part => part.trim());
                         const variableName = nameParts.join('/');
                         try {
-                            // Create the variable
-                            const variable = figma.variables.createVariable(variableName, collection.id, 'COLOR');
+                            // Check if variable already exists
+                            const existingVariables = figma.variables.getLocalVariables();
+                            const existingVariable = existingVariables.find(v => v.name === variableName &&
+                                v.variableCollectionId === collection.id);
+                            let variable;
+                            if (existingVariable) {
+                                // Update existing variable
+                                variable = existingVariable;
+                            }
+                            else {
+                                // Create new variable
+                                variable = figma.variables.createVariable(variableName, collection.id, 'COLOR');
+                            }
                             // Set the variable value
                             variable.setValueForMode(collection.modes[0].modeId, {
                                 r: r,
@@ -71,6 +82,19 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
                                 b: b,
                                 a: opacity
                             });
+                            // Bind the variable to the layer's fill
+                            node.fillStyleId = ''; // Clear any existing style
+                            node.fills = [{
+                                    type: 'SOLID',
+                                    color: { r, g, b },
+                                    opacity: opacity,
+                                    boundVariables: {
+                                        color: {
+                                            type: "VARIABLE_ALIAS",
+                                            id: variable.id
+                                        }
+                                    }
+                                }];
                             successCount++;
                         }
                         catch (error) {
